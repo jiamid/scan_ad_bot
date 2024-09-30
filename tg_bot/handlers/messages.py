@@ -22,13 +22,6 @@ async def cmd_id(message: Message) -> None:
 
 
 @telegram_router.message(CommandStart())
-async def cmd_start(message: Message) -> None:
-    await message.answer(f'*Hello {to_escape_string(message.from_user.first_name)}*\n'
-                         f'\n`画xxxxxx`'
-                         f'\n`/help`'
-                         f'\n\n', parse_mode='MarkdownV2')
-
-
 @telegram_router.message(Command("help"))
 async def cmd_start(message: Message) -> None:
     await message.answer(f'*Hello {to_escape_string(message.from_user.first_name)}*\n'
