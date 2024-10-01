@@ -37,7 +37,7 @@ class SchedulerManager:
         self.scheduler.add_job(task, id=task_id,
                                replace_existing=True,
                                trigger='interval',
-                               minutes=10,
+                               minutes=60,
                                next_run_time=datetime.now() + timedelta(seconds=10)
                                )
         return True
