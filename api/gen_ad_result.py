@@ -4,19 +4,23 @@
 # @Email   : jiamid@qq.com
 # @File    : gen_ad_result.py
 # @Software: PyCharm
-from fastapi import APIRouter
-from commonts.json_manager import json_manager
 from datetime import datetime
 from collections import defaultdict
 from fastapi.responses import HTMLResponse
+from fastapi import APIRouter, Request, HTTPException
+from commonts.util import is_white_ip
+from commonts.json_manager import json_manager
 
 router = APIRouter()
 
 
 @router.get('/r/{result_id}', response_class=HTMLResponse)
-async def gen_ad_result(result_id: str):
-    data = json_manager.read_file(result_id)
-    return generate_ad_html(data)
+async def gen_ad_result(result_id: str, req: Request):
+    if is_white_ip(req):
+        data = json_manager.read_file(result_id)
+        return generate_ad_html(data)
+    else:
+        raise HTTPException(status_code=404, detail='Not Found')
 
 
 def generate_div_table_v2(data):
