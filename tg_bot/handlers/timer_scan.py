@@ -53,7 +53,7 @@ async def scan_one(keyword: str, os: int, region: str, chat_ids: list,
                     domain = rw
                 index += 1
                 # result_msg += f'[{index}号]({to_escape_string(k)})\n'
-                result_msg += f'>domain:{to_escape_string(v["domain"])}\n'
+                # result_msg += f'>domain:{to_escape_string(v["domain"])}\n'
                 result_list.append({
                     'keyword': keyword,
                     'os': os_name_map.get(os, os),
