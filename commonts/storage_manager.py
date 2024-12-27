@@ -5,6 +5,7 @@
 # @File    : storage_manager.py
 # @Software: PyCharm
 import json
+import datetime
 import base64
 from loguru import logger
 import os
@@ -21,12 +22,19 @@ class StorageManager:
             self.data = default_data
             self.save_file()
 
+    def reset_data(self):
+        self.data = {}
+        self.save_file()
+
     def get_value(self, key, default):
         return self.data.get(key, default)
 
     def del_key(self, key):
-        del self.data[key]
-        self.save_file()
+        try:
+            del self.data[key]
+            self.save_file()
+        except Exception as e:
+            logger.error(f'del {key} error {e}')
 
     def set_value(self, key, value):
         self.data[key] = value
@@ -37,14 +45,14 @@ class StorageManager:
         if value not in key_list:
             key_list.append(value)
         self.set_value(key, key_list)
-        logger.info(f'add {value} {key}:{key_list}')
+        logger.info(f'add {value} {key}: {key_list}')
 
     def del_from_key(self, key, value):
         key_list = self.data.get(key, [])
         if value in key_list:
             key_list.remove(value)
         self.set_value(key, key_list)
-        logger.info(f'del {value} {key}:{key_list}')
+        logger.info(f'del {value} {key}: {key_list}')
 
     def save_file(self):
         try:
@@ -123,6 +131,7 @@ timer_task_storage = StorageManager('timer_task', {
         '亚马逊云代理',
     ],
     'chat_ids': [],
+    'targets': [],
     'sem': 5
 })
 
@@ -143,6 +152,7 @@ group_storage = StorageManager('group', {
 
 })
 
+
 class ProxyManager:
     proxy_map = proxys_storage.data
 
@@ -162,3 +172,37 @@ proxy_manager = ProxyManager()
 iptable_storage = StorageManager('iptable', {
     'white': []
 })
+
+
+class ClickTaskResultManager:
+
+    def __init__(self):
+        self.data = StorageManager('click_task_result', {})
+        self.log_list: list[str] = []
+
+    def add(self, target: str, times: int = 1):
+        now_times = self.data.get_value(target, 0)
+        self.data.set_value(target, now_times + times)
+
+    def minus(self, target: str, times: int = 1):
+        now_times = self.data.get_value(target, 0)
+        new_times = now_times - times
+        if new_times <= 0:
+            self.data.del_key(target)
+        else:
+            self.data.set_value(target, new_times)
+
+    def log_click(self, target, keyword):
+        self.add(target)
+        now = datetime.datetime.now()
+        now_str = now.strftime('%m-%d %H:%M:%S')
+        self.log_list.append(f'[{now_str}]{keyword}->{target}')
+
+    def remove(self, target):
+        self.data.del_key(target)
+
+    def remove_all(self):
+        self.data.reset_data()
+
+
+click_task_manager = ClickTaskResultManager()

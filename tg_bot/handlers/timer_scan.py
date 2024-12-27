@@ -4,40 +4,25 @@
 # @Email   : jiamid@qq.com
 # @File    : timer_scan.py
 # @Software: PyCharm
-from commonts.async_task_manager import AsyncTaskManager
-from tg_bot.bot import bot
+import itertools
+from loguru import logger
+from datetime import datetime
 from commonts.storage_manager import timer_task_storage
 from commonts.storage_manager import proxy_manager
 from commonts.storage_manager import history_html_storage
 from commonts.json_manager import json_manager
 from commonts.util import to_escape_string
 from commonts.search import Google
-from loguru import logger
-import asyncio
-from datetime import datetime
-import itertools
+from commonts.async_task_manager import AsyncTaskManager
+from tg_bot.bot import send_message_to_bot
 from commonts.settings import settings
-
-
-async def send_message_to_bot(chat_id, text, parse_mode=None):
-    flag = True
-    times = 1
-    while flag and times < 3:
-        try:
-            await bot.send_message(chat_id, text=text, parse_mode=parse_mode)
-            flag = False
-        except Exception as e:
-            logger.error(f'send message fail {times} e:{e}')
-            times += 1
-            await asyncio.sleep(1)
-
 
 os_map = {
     0: None,
-    1: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.59 Safari/537.36',
+    1: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     2: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
-    3: 'Mozilla/5.0 (Linux; Android  11; Pixel 5a) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.5938.9 Mobile Safari/537.36',
-    4: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.6045.59 Safari/537.36',
+    3: 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36',
+    4: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15',
 }
 os_name_map = {
     1: 'WIN',
@@ -59,10 +44,15 @@ async def scan_one(keyword: str, os: int, region: str, chat_ids: list,
             index = 0
             for k, v in result.items():
                 domain = v.get('domain')
+                rw = v.get('rw')
                 if not domain:
-                    continue
+                    logger.info(f'no domain {v}')
+                    result_msg += f'>domain: [{index}]({to_escape_string(rw)})\n'
+                else:
+                    result_msg += f'>domain:{to_escape_string(v["domain"])}\n'
+                    domain = rw
                 index += 1
-                result_msg += f'[{index}号]({to_escape_string(k)})\n'
+                # result_msg += f'[{index}号]({to_escape_string(k)})\n'
                 result_msg += f'>domain:{to_escape_string(v["domain"])}\n'
                 result_list.append({
                     'keyword': keyword,
