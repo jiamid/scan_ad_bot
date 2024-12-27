@@ -10,3 +10,4 @@ from . import task_setting
 from . import group_manager
 from . import iptable_setting
 from . import target_setting
+from . import click_result_manager
