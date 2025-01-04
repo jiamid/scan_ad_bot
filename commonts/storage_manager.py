@@ -131,6 +131,7 @@ timer_task_storage = StorageManager('timer_task', {
         '亚马逊云代理',
     ],
     'chat_ids': [],
+    'click_keywords': [],
     'targets': [],
     'sem': 5
 })
