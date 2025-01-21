@@ -112,13 +112,26 @@
 
             const keys = Array.from(document.getElementsByName("key")).map(input => input.value);
             const targets = Array.from(document.getElementsByName("target")).map(input => input.value);
+            const ua_version = Array.from(document.getElementsByName("ua_version")).map(input => input.value);
+            const search_num = parseInt(document.getElementsByName("search_num")[0].value);
+            const scroll_num = parseInt(document.getElementsByName("scroll_num")[0].value);
+            const ua = parseInt(document.getElementsByName("ua")[0].value);
+            const webrtc = document.getElementsByName("webrtc")[0].value;
 
             const response = await fetch("/set_task_config?sign=jiamid", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ keywords: keys, targets: targets })
+                body: JSON.stringify({
+                keywords: keys,
+                targets: targets,
+                ua_version: ua_version,
+                search_num: search_num,
+                scroll_num: scroll_num,
+                ua: ua,
+                webrtc: webrtc,
+                 })
             });
 
             const result = await response.json();
@@ -145,6 +158,30 @@
                 <button type="button" class="add-btn" onclick="addField('target')">+</button>
             </div>
         </div>
+
+        <h2>浏览器内核</h2>
+        <div id="ua_version-container">
+            <div class="form-group">
+                <input type="number" name="ua_version" value="130" placeholder="Enter ua_version" required>
+                <button type="button" class="add-btn" onclick="addField('ua_version')">+</button>
+            </div>
+        </div>
+
+        <h2>频率配置</h2>
+        <div id="search_num-container">
+            <div class="form-group">
+                <input type="number" name="search_num" value=10 min=1 placeholder="浏览器数量" required>
+                <input type="number" name="scroll_num" value=7 min=1 placeholder="翻页数量" required>
+            </div>
+        </div>
+        <h2>浏览器设置</h2>
+        <div id="ua-container">
+            <div class="form-group">
+                <input type="number" name="ua" value=4 min=1 max=4 placeholder="请求头类型 1:WIN,2:IOS,3:A 4:MAC" required>
+                <input type="text" name="webrtc" value="proxy" placeholder="webrtc" required>
+            </div>
+        </div>
+
 
         <button type="submit">提交</button>
     </form>
