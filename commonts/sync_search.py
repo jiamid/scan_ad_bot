@@ -4,7 +4,7 @@
 # @Email   : jiamid@qq.com
 # @File    : search.py
 # @Software: PyCharm
-import aiohttp
+from curl_cffi import requests
 from loguru import logger
 from urllib.parse import urlparse
 from lxml import etree
@@ -38,18 +38,14 @@ class Google:
                     self.proxy = f'http:{split_list[1]}:{split_list[2]}'
                     username = split_list[3]
                     password = split_list[4]
-                    self.proxy_auth = aiohttp.BasicAuth(username, password, encoding='utf-8')
 
     def get_useragent(self):
         return random.choice(self.useragent_list)
 
     async def request(self, method: str, url: str, **kwargs):
-        timeout = aiohttp.ClientTimeout(total=10)
-        conn = aiohttp.TCPConnector(ssl=False, limit_per_host=1)
-        async with aiohttp.ClientSession(connector=conn, timeout=timeout) as session:
-            async with session.request(method=method, url=url, **kwargs) as resp:
-                html = await resp.text()
-                return html
+        resp = requests.request(method=method, url=url, **kwargs,verify=False)
+        return resp.text
+
 
     async def search(self, keyword, results, lang, start, ua=None):
         headers = {
